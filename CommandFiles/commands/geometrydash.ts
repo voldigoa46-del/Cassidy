@@ -8,8 +8,9 @@ const gdcmd = defineCommand({
     otherNames: ["dash", "geometrydash", "gdbrowser"],
     category: "Utilities",
     description: "Anything related to GDBrowser.",
-    version: "1.0.1",
+    version: "1.1.0",
     icon: "🛠️",
+    author: "@lianecagara",
   },
   style: {
     title: "🛠️ GDBrowser",
@@ -25,37 +26,74 @@ const gdoptions = new SpectralCMDHome({ isHypen: false }, [
     key: "search",
     description: "Search Top 5 GD Level, same algo as GD.",
     aliases: ["s"],
-    args: ["<level_name>"],
-    async handler({ output }, { spectralArgs }) {
-      const name = spectralArgs.join(" ");
-      if (!name) {
-        return output.reply(
-          `🔎 Please enter a level name or level ID as next arguments. (Same algo as original search bar in GD), Only shows TOP 5 results.`
+    args: ["<level_name>", "|", "[page_num]"],
+    async handler(
+      { output, input, prefix, commandName },
+      { spectralArgs, execOther }
+    ) {
+      try {
+        let [name, page_n] = input.splitBody("|", spectralArgs.join(" "));
+        page_n ||= "1";
+        const page = parseInt(page_n) || 1;
+        if (!name) {
+          return output.reply(
+            `🔎 Please enter a level name or level ID as next arguments. (Same algo as original search bar in GD), Only shows 5 results per page. You can specify page by using | \n\n**Example**: ${prefix}${commandName} search Nock Em | 3`
+          );
+        }
+        await output.reaction("⏳");
+        const levels = await GDBrowserAPI.search(name, {
+          page,
+          count: 5,
+        });
+        const top5 = levels.slice(0, 5);
+        const getLikeEmo = (likes: number) => (likes < 0 ? `👎` : `👍`);
+        const mapped = [
+          `🔎 **5 Results** (Page **${page}**)`,
+          ...top5.map(
+            (level, ind) =>
+              `**${ind + 1}**. **${level.name}** (#${level.id})\n${
+                UNISpectra.arrow
+              } By ${level.author}\n**${level.difficulty?.toUpperCase()}**${
+                level.featured ? ` ✨ **${level.stars || 1}**` : ""
+              } ${"🪙".repeat(level.coins || 0)}\n🕒 ${
+                level.length
+              } | 📥 ${abbreviateNumber(level.downloads || 0)} | ${getLikeEmo(
+                level.likes || 0
+              )} ${abbreviateNumber(level.likes || 0)}\n🎵 ***${
+                level.songName
+              }***\n${UNISpectra.arrowFromT} ***By ${level.songAuthor}***`
+          ),
+          `✅ Reply with a **number** between **1** to **5** to view the level information.`,
+        ].join(`\n${UNISpectra.standardLine}\n`);
+        const res = await output.reply(
+          mapped.length === 1 ? "No Results." : mapped
         );
+        res.atReply(async (ctxRep) => {
+          const { input: input2, output: output2 } = ctxRep;
+          output2.setStyle(gdcmd.style);
+          const targnum = parseInt(input2.text[0]);
+          if (isNaN(targnum)) {
+            return output2.reply("⚠️ Invalid number.");
+          }
+          const targ = top5.find((_, j) => j + 1 === targnum);
+          if (!targ) {
+            return output2.reply(
+              `⚠️ Reply with a **number** between **1** to **5**`
+            );
+          }
+          return execOther({
+            key: "view",
+            spectralArgsNew: [targ.id],
+            io: {
+              input: input2,
+              output: output2,
+            },
+          });
+        });
+        await output.reaction("✅");
+      } catch (error) {
+        return output.reply("No Results.");
       }
-      await output.reaction("⏳");
-      const levels = await GDBrowserAPI.search(name);
-      const top5 = levels.slice(0, 5);
-      const getLikeEmo = (likes: number) => (likes < 0 ? `👎` : `👍`);
-      const mapped = [
-        "🔎 **Top 5 Results**",
-        ...top5.map(
-          (level) =>
-            `**${level.name}** (#${level.id})\n${UNISpectra.arrow} By ${
-              level.author
-            }\n[${level.difficulty?.toUpperCase()}${
-              level.featured ? ` ✨ **${level.stars || 1}**` : ""
-            }]\n🕒 ${level.length} | 📥 ${abbreviateNumber(
-              level.downloads || 0
-            )} | ${getLikeEmo(level.likes || 0)} ${abbreviateNumber(
-              level.likes || 0
-            )}\n🎵 ***${level.songName}***\n${UNISpectra.arrowFromT} ***By ${
-              level.songAuthor
-            }***`
-        ),
-      ].join(`\n${UNISpectra.standardLine}\n`);
-      await output.reply(mapped.length === 1 ? "No Results." : mapped);
-      await output.reaction("✅");
     },
   },
   {
@@ -71,27 +109,56 @@ const gdoptions = new SpectralCMDHome({ isHypen: false }, [
         }
         await output.reaction("⏳");
         const level = await GDBrowserAPI.level(ID);
-        const getLikeEmo = (likes: number) =>
-          likes < 0 ? `👎 **Dislikes**:` : `👍 **Likes**:`;
+        const getLikeEmo = (likes: number) => (likes < 0 ? `👎` : `👍`);
         const mapped = `**${level.name}** (#${level.id})\n${
           UNISpectra.arrow
         } By ${level.author}\n\n${
           level.description || "(No Description Provided)"
-        }\n\n🕒 **Length**: ${
-          level.length
-        }\n📥 **Downloads**: (${abbreviateNumber(level.downloads || 0)}) ${
+        }\n\n🕒 **${level.length}**\n📥 **(${abbreviateNumber(
           level.downloads || 0
-        }\n${getLikeEmo(level.likes || 0)} (${abbreviateNumber(
+        )})** ${(level.downloads || 0).toLocaleString()}\n${getLikeEmo(
           level.likes || 0
-        )}) ${level.likes || 0}\n✅ **Coins**: ${"🪙".repeat(
-          level.coins || 0
-        )}\n😸 **Difficulty**: ${level.difficulty?.toUpperCase()} ${
-          level.featured ? `✨ **${level.stars || 1}**` : ""
-        }\n${UNISpectra.standardLine}\n🎵 **Song**: ***${level.songName}*** (#${
+        )} **(${abbreviateNumber(level.likes || 0)})** ${(
+          level.likes || 0
+        ).toLocaleString()}\n**${level.difficulty?.toUpperCase()}** ${
+          level.featured
+            ? `✨ **${level.stars || 1}** ${"🪙".repeat(level.coins || 0)}`
+            : ""
+        }\n${UNISpectra.standardLine}\n🎵 ***${level.songName}*** (#${
           level.songID
-        })\n${UNISpectra.arrowFromT} ***By ${level.songAuthor}***`;
+        })\n${UNISpectra.arrowFromT} ***By ${level.songAuthor}***\n${
+          UNISpectra.standardLine
+        }\n(To view comments, reply with a page **number** like 1)`;
 
-        await output.reply(mapped);
+        const res = await output.reply(mapped);
+        res.atReply(async (repCtx) => {
+          const { input, output } = repCtx;
+          output.setStyle(gdcmd.style);
+          const page = parseInt(input.text[0]);
+          if (isNaN(page)) {
+            return output.reply("⚠️ Invalid number.");
+          }
+          try {
+            const comments = await GDBrowserAPI.comments(level.id, {
+              page,
+              count: 8,
+            });
+            if (!comments.length) {
+              throw 69;
+            }
+            const commentsStr = comments
+              .map(
+                (c) =>
+                  `👤 **${c.username}**${
+                    c.percent ? `  %${c.percent}` : ""
+                  } ${"🪙".repeat(c.coins || 0)}\n${c.content}`
+              )
+              .join(`\n${UNISpectra.standardLine}\n`);
+            return output.reply(commentsStr);
+          } catch (error) {
+            return output.reply("No Results.");
+          }
+        });
         await output.reaction("✅");
       } catch (error) {
         return output.reply("No Results.");

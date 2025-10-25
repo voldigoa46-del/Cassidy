@@ -125,7 +125,7 @@ export namespace GDBrowserAPI {
 
   export async function search(
     query: string,
-    params?: Record<string, any>
+    params?: { page?: number; count?: number }
   ): Promise<Levels> {
     return (await get("search", query, params)).data;
   }

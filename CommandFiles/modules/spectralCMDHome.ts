@@ -3,6 +3,11 @@ import { UNIRedux } from "@cass/unispectra";
 export type Extra = {
   targets: Config[];
   key: string;
+  execOther(config: {
+    key: string;
+    spectralArgsNew: string[];
+    io: { output: CommandContext["output"]; input: CommandContext["input"] };
+  }): Promise<any>;
   itemList?: string | undefined;
   cancelCooldown?: () => void;
   spectralArgs?: string[];
@@ -330,13 +335,34 @@ export class SpectralCMDHome {
     const spectralArgs = this.options.isHypen
       ? ctx.args
       : ctx.args.slice(this.options.argIndex + 1);
+    const self = this;
 
-    const extraCTX: Parameters<Config["handler"]>["1"] = {
+    const extraCTX: Extra = {
       targets,
       key,
       self: this,
       itemList: this.createHomeLists(this.configs, ctx),
       spectralArgs,
+      async execOther({ key, spectralArgsNew, io }) {
+        const firstTarget = self.findTargets(key)[0];
+        if (firstTarget) {
+          return firstTarget.handler(
+            {
+              ...ctx,
+              output: io.output,
+              input: io.input,
+            },
+            {
+              ...extraCTX,
+              spectralArgs: spectralArgsNew,
+              key,
+              targets: [firstTarget],
+            }
+          );
+        } else {
+          throw new Error("Missing target.");
+        }
+      },
       cancelCooldown: () => {
         const userId = ctx.input.senderID;
         const userCooldowns = this.cooldowns.get(userId);
