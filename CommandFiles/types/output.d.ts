@@ -8,6 +8,9 @@
 import { BriefcaseAPI } from "@cass-modules/BriefcaseAPI";
 
 type Readable = import("stream").Readable;
+/**
+ * @deprecated
+ */
 type OutputResultNew = import("@cass-plugins/output").OutputResult;
 
 export interface StrictOutputForm {
@@ -27,7 +30,9 @@ export interface StrictOutputForm {
     longitude: number;
   };
   rawBody?: boolean;
-  callback?: (info: OutputResultNew) => void | Promise<void>;
+  callback?: (
+    info: import("@cass-modules/OutputClass").OutputSent
+  ) => void | Promise<void>;
   isReply?: boolean;
   messageID?: string;
   noLevelUI?: boolean;
@@ -43,12 +48,17 @@ export interface OutputResult extends StrictOutputForm {
   styleFields?: Record<string, any>;
   originalOptionsBody?: string;
 }
+
+/**
+ * @deprecated
+ */
 export type OutputResultInf = OutputResult;
 export { OutputResultNew };
 
 export type OutputForm = string | StrictOutputForm;
 /**
  * Interface representing the properties and methods for handling output operations.
+ * @deprecated
  */
 export interface OutputProps {
   /**
@@ -90,8 +100,8 @@ export interface OutputProps {
    */
   reply(
     body: OutputForm,
-    callback?: (info: OutputResultNew) => void
-  ): Promise<OutputResultNew>;
+    callback?: (info: import("@cass-modules/OutputClass").OutputSent) => void
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Registers a reply listener to handle replies asynchronously.
@@ -130,7 +140,7 @@ export interface OutputProps {
     text: string,
     id?: string,
     destination?: string
-  ): Promise<OutputResultNew>;
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Handles an error by sending it with an optional callback.
@@ -153,8 +163,8 @@ export interface OutputProps {
   send(
     body: OutputForm,
     id?: string,
-    callback?: (info: OutputResultNew) => void
-  ): Promise<OutputResultNew>;
+    callback?: (info: import("@cass-modules/OutputClass").OutputSent) => void
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Adds a user to a thread.
@@ -223,7 +233,7 @@ export interface OutputProps {
     form: OutputForm,
     style: CassidySpectra.CommandStyle,
     thread?: string
-  ): Promise<OutputResultNew>;
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Sends a styled message with the specified form, style, and optional thread.
@@ -236,7 +246,7 @@ export interface OutputProps {
     form: OutputForm,
     style: CassidySpectra.CommandStyle,
     thread?: string
-  ): Promise<OutputResultNew>;
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Attaches a stream to a message with optional style.
@@ -249,7 +259,7 @@ export interface OutputProps {
     form: OutputForm,
     stream: string | Readable[] | Readable | any,
     style?: CassidySpectra.CommandStyle
-  ): Promise<OutputResultNew>;
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * A class for creating styled messages.
@@ -276,14 +286,18 @@ export interface OutputProps {
        * @param body - The content of the reply.
        * @returns A promise resolving to the result of the reply.
        */
-      reply(body: string): Promise<OutputResultNew>;
+      reply(
+        body: OutputForm
+      ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
       /**
        * Sends a message with the specified body.
        * @param body - The content of the message.
        * @returns A promise resolving to the result of the message.
        */
-      send(body: string): Promise<OutputResultNew>;
+      send(
+        body: OutputForm
+      ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
       /**
        * Edits a message with the specified body and message ID.
@@ -292,7 +306,7 @@ export interface OutputProps {
        * @param delay - Optional delay before editing the message.
        * @returns A promise resolving when the operation is complete.
        */
-      edit(body: string, messageID: string, delay?: number): Promise<void>;
+      edit(body: string, messageID: string, delay?: number): Promise<boolean>;
     };
   };
 
@@ -300,7 +314,7 @@ export interface OutputProps {
    * Handles a generic error scenario.
    * @returns A promise resolving to the result of the operation.
    */
-  wentWrong(): Promise<OutputResultNew>;
+  wentWrong(): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Handles a syntax error in a command.
@@ -308,7 +322,9 @@ export interface OutputProps {
    * @deprecated
    * @returns A promise resolving to the result of the operation.
    */
-  syntaxError(commandX?: any): Promise<OutputResultNew>;
+  syntaxError(
+    commandX?: any
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Edits a message with the specified text, message ID, and optional delay and style.
@@ -328,7 +344,7 @@ export interface OutputProps {
   dispatch(
     body: OutputForm,
     options: StrictOutputForm
-  ): Promise<OutputResultNew>;
+  ): Promise<import("@cass-modules/OutputClass").OutputSent>;
 
   /**
    * Creates frames from the specified arguments.
