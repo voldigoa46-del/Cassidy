@@ -849,8 +849,7 @@ export class OutputClass implements OutputProps {
           );
           res(
             // @ts-ignore
-
-            new OutputResult(obj, {
+            new OutputSent(obj, {
               ...options,
               ...resultInfo,
               messageID: newMid,
