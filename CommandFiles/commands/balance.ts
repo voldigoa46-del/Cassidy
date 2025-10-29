@@ -6,7 +6,7 @@ export const meta: CommandMeta = {
   name: "balance",
   description: "Check your virtual cash",
   otherNames: ["bal", "money"],
-  version: "3.2.10",
+  version: "3.2.11",
   usage: "{prefix}{name}",
   category: "Finance",
   author: "@lianecagara",
@@ -46,7 +46,7 @@ export function sortUsers(
     id,
     {
       data,
-      total: money ? money.extractMoney(data).total : 0,
+      total: (money ? money.extractMoney(data).total : 0) || 0,
     },
   ]);
 
@@ -62,7 +62,7 @@ export function sortUsersNotTotal(
   top?: number
 ) {
   const entries = Object.entries(users).sort(
-    ([, a], [, b]) => b.money - a.money
+    ([, a], [, b]) => (b.money || 0) - (a.money || 0)
   );
 
   const sliced = top && top > 0 ? entries.slice(0, top) : entries;
@@ -140,6 +140,7 @@ const configs: Config[] = [
       { spectralArgs }
     ) {
       const canv = CanvCass.premade();
+      canv.changeScale(2);
 
       await money.ensureUserInfo(input.senderID);
       let senderID = input.senderID;
@@ -203,38 +204,87 @@ const configs: Config[] = [
       });
 
       canv.drawText(`${style.title}`, {
-        cssFont: `bold 70px Cassieah-Bold, EMOJI, sans-serif`,
         x: container.left + 50,
-        y: container.top - 70,
+        y: (container.top - canv.top) / 2,
         align: "left",
         fill: "white",
-        baseline: "bottom",
+        fontType: "cbold",
+        size: 70,
+      });
+      canv.drawText(`CassieahBoT`, {
+        x: container.right - 50,
+        y: (container.top - canv.top) / 2,
+        align: "right",
+        fill: "rgba(255, 255,255, 0.7)",
+        fontType: "cbold",
+        size: 50,
       });
 
       canv.drawText(`👤 ${playerMoney.name}`, {
         fontType: "cbold",
         size: 50,
         x: container.centerX,
-        y: container.top + 100,
+        y: container.centerY - 75,
+        vAlign: "top",
         align: "center",
-        baseline: "bottom",
         fill: "rgba(255, 255,255, 0.7)",
       });
-      canv.drawText(`$${abbreviateNumber(playerMoney.money, 2, true)}`, {
+      canv.drawText(`$${abbreviateNumber(playerMoney.money, 4, true)}`, {
         fontType: "cbold",
         size: 75,
         x: container.centerX,
         y: container.centerY,
-        baseline: "middle",
         align: "center",
         fill: "white",
       });
+      if (playerMoney.money < 1_000_000_000) {
+        canv.drawText(`$${playerMoney.money.toLocaleString()}`, {
+          fontType: "cbold",
+          size: 35,
+          x: container.centerX,
+          y: container.centerY + 50,
+          vAlign: "bottom",
+          align: "center",
+          fill: "rgba(255, 255,255, 0.7)",
+        });
+      }
       canv.drawText(`🏆 Top #${top}`, {
         fontType: "cbold",
         size: 100,
         x: container.centerX,
         y: container.bottom,
-        baseline: "middle",
+        align: "center",
+        fill: "white",
+      });
+      canv.drawText(`💵`, {
+        fontType: "cbold",
+        size: 150,
+        x: canv.right - 150 / 2,
+        y: canv.bottom - 250 / 2 + 20,
+        align: "center",
+        fill: "white",
+      });
+      canv.drawText(`💵`, {
+        fontType: "cbold",
+        size: 250,
+        x: canv.right - 250 / 2,
+        y: canv.bottom,
+        align: "center",
+        fill: "white",
+      });
+      canv.drawText(`🪙`, {
+        fontType: "cbold",
+        size: 150,
+        x: canv.left + 150 / 2,
+        y: canv.bottom - 250 / 2 + 20,
+        align: "center",
+        fill: "white",
+      });
+      canv.drawText(`🪙`, {
+        fontType: "cbold",
+        size: 250,
+        x: canv.left + 250 / 2,
+        y: canv.bottom,
         align: "center",
         fill: "white",
       });

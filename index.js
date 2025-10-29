@@ -52,6 +52,10 @@ function runChildProcess() {
       console.log("Recalling Cassidy...");
       runChildProcess();
     }
+    if (code >= 128 || code === 0) {
+      console.log("Recalling Cassidy...");
+      runChildProcess();
+    }
   });
 }
 

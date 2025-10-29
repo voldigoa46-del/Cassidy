@@ -2,6 +2,7 @@ import { GDBrowserAPI } from "@cass-modules/GDBrowserAPI";
 import { fetchThumbnail, Quality } from "@cass-modules/GDLevelThumbnail";
 import { SpectralCMDHome } from "@cassidy/spectral-home";
 import { abbreviateNumber, UNISpectra } from "@cassidy/unispectra";
+import { loadImage } from "@napi-rs/canvas";
 
 const gdcmd = defineCommand({
   meta: {
@@ -143,7 +144,7 @@ const gdoptions = new SpectralCMDHome({ isHypen: false }, [
 
         const res = await output.reply({
           body: mapped,
-          attachment: thumb ?? undefined,
+          attachment: thumb,
         });
         const onRep = async (repCtx: CommandContext) => {
           const { input, output } = repCtx;

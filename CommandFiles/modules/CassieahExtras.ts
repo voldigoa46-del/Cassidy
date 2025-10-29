@@ -529,7 +529,17 @@ export class CanvCass {
       cssFont: font = "",
       align = "center",
       baseline = "middle",
+      vAlign = "middle",
+      size,
     } = options;
+
+    if (vAlign === "top") {
+      y -= size / 2;
+    }
+
+    if (vAlign === "bottom") {
+      y += size / 2;
+    }
 
     ctx.save();
 
@@ -749,6 +759,7 @@ export namespace CanvCass {
     strokeWidth?: number;
     align?: CanvasTextAlign;
     baseline?: CanvasTextBaseline;
+    vAlign?: "middle" | "top" | "bottom";
   }
   export interface MeasureTextParam {
     text: string;
