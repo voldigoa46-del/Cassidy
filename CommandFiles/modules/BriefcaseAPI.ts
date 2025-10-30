@@ -406,6 +406,7 @@ export type BriefcaseAPIExtraConfig = Partial<SpectraMainConfig> & {
   showCollectibles: boolean;
   meta?: CommandMeta;
   readonly?: boolean;
+  showAdminFeat?: boolean;
 };
 
 export class BriefcaseAPI {
@@ -424,6 +425,7 @@ export class BriefcaseAPI {
     extraConfig.inventoryIcon ??= "🎒";
     extraConfig.showCollectibles ??= true;
     extraConfig.readonly ??= false;
+    extraConfig.showAdminFeat ??= true;
     this.meta = extraConfig.meta;
     this.extraConfig = extraConfig;
     this.extraItems = extraItems ?? [];
@@ -532,7 +534,10 @@ export class BriefcaseAPI {
       iKey: ikey,
       instance: this,
     };
-    const mappedExtra = [...this.extraItems, ...adminFeatures].map((i) => {
+    const mappedExtra = [
+      ...this.extraItems,
+      ...(this.extraConfig.showAdminFeat ? [...adminFeatures] : []),
+    ].map((i) => {
       return {
         ...i,
         handler(ctx: CommandContext, extra: Extra) {
