@@ -49,7 +49,7 @@ const levelTracker = new BackgroundTaskFB<Map<string, LevelTrackerCache>>({
             (c) => !recognized.includes(c.content)
           );
           const newCommentsList = newComments
-            .slice(0, 8)
+            .slice(0, 16)
             .map(
               (c) =>
                 `👤 **${c.username}**${
