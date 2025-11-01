@@ -941,7 +941,7 @@ export namespace CanvCass {
     size?: number;
   }
 
-  export function lineYs(height: number, lines: number): number[] {
+  export function lineYs(height: number, lines: number, offset = 0): number[] {
     if (lines <= 0) return [];
 
     const spacing = height / lines;
@@ -949,7 +949,7 @@ export namespace CanvCass {
     const ys: number[] = [];
 
     for (let i = 0; i < lines; i++) {
-      ys.push(Math.round(halfSpacing + spacing * i));
+      ys.push(Math.round(halfSpacing + spacing * i + offset));
     }
 
     return ys;

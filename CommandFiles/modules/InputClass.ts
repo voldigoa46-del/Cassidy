@@ -99,6 +99,10 @@ export class InputClass extends String implements InputProps {
 
   public attachmentUrls: string[];
 
+  public get prefix() {
+    return this.#__context.prefix;
+  }
+
   constructor(obj: CommandContext) {
     const { replies, reacts } = global.Cassidy;
 

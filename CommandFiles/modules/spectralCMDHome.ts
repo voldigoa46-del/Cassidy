@@ -328,9 +328,9 @@ export class SpectralCMDHome {
     const { input, output } = ctx;
     ctx.cancelCooldown?.();
     const key =
-      this.options.isHypen && "propertyArray" in input
+      (this.options.isHypen && "propertyArray" in input
         ? input.propertyArray[this.options.argIndex]
-        : input.arguments[this.options.argIndex] || "";
+        : input.arguments[this.options.argIndex] || "") || "";
     const targets = this.findTargets(key);
     const spectralArgs = this.options.isHypen
       ? ctx.args
