@@ -75,7 +75,8 @@ export async function entry({
       size: 50,
       fill: "rgba(255, 255, 255, 0.97)",
       x: canv.centerX,
-      y: canv.bottom - 60,
+      breakTo: "top",
+      y: canv.bottom - 120,
       breakMaxWidth: canv.width - 60 * 2,
     });
 

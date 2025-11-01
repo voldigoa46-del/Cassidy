@@ -657,6 +657,7 @@ export class CanvCass {
       vAlign = "middle",
       size,
       yMargin = 0,
+      breakTo = "bottom",
       breakMaxWidth = Infinity,
     } = options;
 
@@ -669,6 +670,9 @@ export class CanvCass {
     }
 
     ctx.save();
+
+    const lineHeight = size + (yMargin ?? 0);
+    const direction = breakTo === "top" ? -1 : 1;
 
     ctx.font = font;
     ctx.textAlign = align;
@@ -684,6 +688,10 @@ export class CanvCass {
 
     let tx = x;
     let ty = y;
+
+    if (breakTo === "top") {
+      ty -= lineHeight * (lines.length - 1);
+    }
     for (const line of lines) {
       if (stroke) {
         ctx.strokeStyle = stroke;
@@ -694,7 +702,7 @@ export class CanvCass {
         ctx.fillStyle = fill;
         ctx.fillText(line, tx, ty);
       }
-      ty += size + yMargin;
+      ty += lineHeight * direction;
     }
 
     ctx.restore();
@@ -924,6 +932,7 @@ export namespace CanvCass {
     y: number;
     yMargin?: number;
     breakMaxWidth?: number;
+    breakTo?: "top" | "bottom";
     cssFont?: string;
     fontType?: "cbold" | "cnormal" | "css";
     size?: number;
