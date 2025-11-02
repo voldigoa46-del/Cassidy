@@ -68,6 +68,10 @@ export async function entry({
   await usersDB.ensureUserInfo(uid);
   const info = await usersDB.getUserInfo(uid);
 
+  if (info?.name === "Unknown User") {
+    delete info.name;
+  }
+
   const name = info?.name ?? userName;
 
   const headline = `${name} claims that ${argsText}`;
