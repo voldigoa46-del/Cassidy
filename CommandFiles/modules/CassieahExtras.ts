@@ -4,6 +4,7 @@ import {
   CanvasRenderingContext2D,
   CanvasTextAlign,
   CanvasTextBaseline,
+  Path2D,
   GlobalFonts,
   Image,
   SKRSContext2D,
@@ -738,6 +739,18 @@ export class CanvCass implements CanvCass.Rect {
     return gradient;
   }
 
+  static rectToPath(rect: CanvCass.Rect): Path2D {
+    const path = new Path2D();
+    path.rect(rect.left, rect.top, rect.width, rect.height);
+    return path;
+  }
+
+  static createCirclePath(center: [number, number], radius: number): Path2D {
+    const path = new Path2D();
+    path.arc(center[0], center[1], radius, 0, Math.PI * 2);
+    return path;
+  }
+
   loadImage = loadImage;
   static loadImage = loadImage;
 
@@ -888,23 +901,20 @@ export class CanvCass implements CanvCass.Rect {
     image: Image,
     x: number,
     y: number,
-    options?: { width?: number; height?: number }
+    options?: CanvCass.DrawImageConfig
   ): Promise<void>;
   async drawImage(
     src: string | Buffer,
     x: number,
     y: number,
-    options?: { width?: number; height?: number }
+    options?: CanvCass.DrawImageConfig
   ): Promise<void>;
 
   async drawImage(
     imageOrSrc: string | Buffer | Image,
     x: number,
     y: number,
-    options?: {
-      width?: number;
-      height?: number;
-    }
+    options?: CanvCass.DrawImageConfig
   ): Promise<void> {
     const ctx = this.#context;
 
@@ -918,6 +928,9 @@ export class CanvCass implements CanvCass.Rect {
 
     ctx.save();
 
+    if (options?.clipTo) {
+      ctx.clip(options.clipTo);
+    }
     if (options?.width && options?.height) {
       ctx.drawImage(image, x, y, options.width, options.height);
     } else {
@@ -925,6 +938,27 @@ export class CanvCass implements CanvCass.Rect {
     }
 
     ctx.restore();
+  }
+
+  withClip(path: Path2D, cb: () => void) {
+    const ctx = this.#context;
+    ctx.save();
+    ctx.clip(path);
+    try {
+      cb();
+    } finally {
+      ctx.restore();
+    }
+  }
+  async withClipAsync(path: Path2D, cb: () => Promise<void>) {
+    const ctx = this.#context;
+    ctx.save();
+    ctx.clip(path);
+    try {
+      await cb();
+    } finally {
+      ctx.restore();
+    }
   }
 
   drawCassItem({
@@ -1043,6 +1077,12 @@ export namespace CanvCass {
     }
 
     return ys;
+  }
+
+  export interface DrawImageConfig {
+    width?: number;
+    height?: number;
+    clipTo?: Path2D;
   }
 
   export type Color = string | CanvasGradient;
