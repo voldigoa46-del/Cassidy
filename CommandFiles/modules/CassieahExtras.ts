@@ -1288,20 +1288,65 @@ export namespace CanvCass {
   }
 
   export interface DrawTextParam {
+    /**
+     * The text you wanna draw.
+     */
     text: string;
+    /**
+     * Reference X (depends on align.)
+     */
     x: number;
+    /**
+     * Reference Y (depends on baseline and vAlign.)
+     */
     y: number;
+    /**
+     * The line spacing whenever a line breaks.
+     */
     yMargin?: number;
+    /**
+     * Maximum width before the text or line breaks. Default to Infinity.
+     */
     breakMaxWidth?: number;
+    /**
+     * Changes whether the text will break naturally (to bottom) or opposite (top)
+     */
     breakTo?: "top" | "bottom";
+    /**
+     * Don't use this no matter what.
+     */
     cssFont?: string;
+    /**
+     * Default stable font options (for the sake of standardization.)
+     */
     fontType?: "cbold" | "cnormal" | "css";
+    /**
+     * Font size.
+     */
     size?: number;
+    /**
+     * Color to fill. (default white.)
+     */
     fill?: Color;
+    /**
+     * Color to stroke (default transparent.)
+     */
     stroke?: string;
+    /**
+     * Stroke width, self explanatory, a stroke thickness.
+     */
     strokeWidth?: number;
+    /**
+     * Text alignment or where it goes.
+     */
     align?: CanvasTextAlign;
+    /**
+     * Don't use this no matter what.
+     */
     baseline?: CanvasTextBaseline;
+    /**
+     * Aligns the text vertically based on half of the font size.
+     */
     vAlign?: "middle" | "top" | "bottom";
   }
   export interface MeasureTextParam {
@@ -1332,8 +1377,17 @@ export namespace CanvCass {
     maximizeFit?: boolean;
   }
 
+  /**
+   * In case you don't know what a color is, it is a color.. for Canvas.
+   */
   export type Color = string | CanvasGradient;
 
+  /**
+   * Loads an image 5 times before it gives up.
+   * @param source Whatever, string, URL instance, a Buffer? ArrayBufferLike? Uint8Arrays, and finally Image of napi-rs canvas.
+   * @param options More options you don't even need.
+   * @returns The normalized napi-rs Image instance. It is NOT a stream. You may only use it for drawImage.
+   */
   export async function loadImage(
     source:
       | string
