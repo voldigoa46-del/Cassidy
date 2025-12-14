@@ -139,7 +139,7 @@ export async function entry({
 
     result += `\n${UNISpectra.arrow} Command details: **${prefix}${commandName} <command>**\n`;
 
-    const resultStr = `🔍 | **Available Commands** 🧰 (${commands.size})\n\n${result}${UNISpectra.charm} Developed by @**Liane Cagara** 🎀`;
+    const resultStr = `🔍 | **Available Commands** 🧰 (${commands.size})\n\n${result}${UNISpectra.charm} Developed by @**CHRISTUS** 🎀`;
     return output.reply(resultStr);
   } else if (
     String(args[0]).toLowerCase() === "search" ||
@@ -284,7 +284,7 @@ export async function entry({
       `${UNISpectra.arrowFromT} Try to ***Explore*** more commands!`,
       `${UNISpectra.arrowFromT} View by page: **${prefix}${commandName} <page>**`,
       `${UNISpectra.arrowFromT} View all: **${prefix}${commandName} all**`,
-      `${UNISpectra.charm} Developed by @**Liane Cagara** 🎀`,
+      `${UNISpectra.charm} Developed by @**CHRISTUS** 🎀`,
     ].join("\n");
     if (1) {
       return output.replyStyled(strs, {
@@ -488,7 +488,7 @@ export async function entry({
     }**\n`;
     result += `${UNISpectra.arrow} Command details: **${prefix}${commandName} <command>**\n`;
 
-    const resultStr = `🔍 | **Available Commands** 🧰 (${commands.size})\n\n${result}${UNISpectra.charm} Developed by @**Liane Cagara** 🎀`;
+    const resultStr = `🔍 | **Available Commands** 🧰 (${commands.size})\n\n${result}${UNISpectra.charm} Developed by @**CHRISTUS** 🎀`;
     return output.reply(resultStr);
   } else {
     const basicCommandsOld = {
