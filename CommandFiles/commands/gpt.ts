@@ -1,4 +1,4 @@
-¥system install gpt.ts import axios, { AxiosResponse } from "axios";
+mport axios, { AxiosResponse } from "axios";
 import { StrictOutputForm } from "output-cassidy";
 
 const API_URL = "https://arychauhann.onrender.com/api/gpt-3.5-turbo";
