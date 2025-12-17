@@ -1,0 +1,158 @@
+// CommandFiles/commands/nijix.ts
+
+import axios from "axios";
+import fs from "fs-extra";
+import path from "path";
+import stream from "stream";
+import { promisify } from "util";
+import moment from "moment-timezone";
+import { defineEntry } from "@cass/define";
+import { UNISpectra } from "@cassidy/unispectra";
+
+const pipeline = promisify(stream.pipeline);
+
+const aspectRatioMap: Record<string, { width: number; height: number }> = {
+  "1:1": { width: 1024, height: 1024 },
+  "9:7": { width: 1152, height: 896 },
+  "7:9": { width: 896, height: 1152 },
+  "19:13": { width: 1216, height: 832 },
+  "13:19": { width: 832, height: 1216 },
+  "7:4": { width: 1344, height: 768 },
+  "4:7": { width: 768, height: 1344 },
+  "12:5": { width: 1500, height: 625 },
+  "5:12": { width: 640, height: 1530 },
+  "16:9": { width: 1344, height: 756 },
+  "9:16": { width: 756, height: 1344 },
+  "2:3": { width: 1024, height: 1536 },
+  "3:2": { width: 1536, height: 1024 },
+};
+
+export const meta: CommandMeta = {
+  name: "nijix",
+  description: "Anime-style image generation with style, preset, and aspect ratio support",
+  author: "Christus",
+  version: "1.1.0",
+  usage: "{prefix}nijix <prompt> [--ar <ratio>] [--s <style>] [--preset <id>]",
+  category: "AI Image Generator",
+  role: 0,
+  waitingTime: 10,
+  otherNames: [],
+  icon: "🎨",
+  noLevelUI: true,
+};
+
+export const style: CommandStyle = {
+  title: "Astral • Nijix Anime Image Generator ✨",
+  titleFont: "bold",
+  contentFont: "fancy",
+};
+
+export const langs = {
+  en: {
+    noPrompt: "❌ Please provide a valid English prompt.",
+    processing: "⏳ Generating your anime-style image...",
+    error: "❌ Failed to generate image. Try again later.",
+    success: "✅ Image generated!\nStyle: {style} | Preset: {preset} | AR: {ar}\nSeed: {seed}",
+  },
+};
+
+export const entry = defineEntry(
+  async ({ input, output, args, langParser }) => {
+    const getLang = langParser.createGetLang(langs);
+    let prompt = args.join(" ").trim();
+
+    if (!prompt) return output.reply(getLang("noPrompt"));
+
+    const styleMatch = prompt.match(/--style (\d+)/);
+    const presetMatch = prompt.match(/--preset (\d+)/);
+    const arMatch = prompt.match(/--ar (\d+:\d+)/);
+
+    const styleIndex = styleMatch ? styleMatch[1] : "0";
+    const presetIndex = presetMatch ? presetMatch[1] : "0";
+    const aspectRatio = arMatch ? arMatch[1] : "1:1";
+
+    prompt = prompt.replace(/--style \d+/, "").replace(/--preset \d+/, "").replace(/--ar \d+:\d+/, "").trim();
+
+    const timestamp = moment().tz("Asia/Manila").format("MMMM D, YYYY h:mm A");
+    const processingMsg = await output.reply(`${UNISpectra.charm} ${getLang("processing")}\n• 📅 ${timestamp}`);
+
+    const resolution = aspectRatioMap[aspectRatio] || aspectRatioMap["1:1"];
+    const session_hash = Math.random().toString(36).substring(2, 13);
+    const randomSeed = Math.floor(Math.random() * 1000000000);
+
+    const payload = {
+      data: [
+        prompt,
+        "",
+        randomSeed,
+        resolution.width,
+        resolution.height,
+        7,
+        28,
+        "Euler a",
+        `${resolution.width} x ${resolution.height}`,
+        "(None)",
+        "Standard v3.1",
+        false,
+        0.55,
+        1.5,
+        true
+      ],
+      event_data: null,
+      fn_index: 5,
+      trigger_id: null,
+      session_hash
+    };
+
+    try {
+      await axios.post("https://asahina2k-animagine-xl-3-1.hf.space/queue/join", payload, {
+        headers: { "User-Agent": "Mozilla/5.0", "Content-Type": "application/json" },
+      });
+
+      const res = await axios.get("https://asahina2k-animagine-xl-3-1.hf.space/queue/data", {
+        headers: { "User-Agent": "Mozilla/5.0", "Accept": "text/event-stream", "Content-Type": "application/json" },
+        params: { session_hash },
+        timeout: 30000
+      });
+
+      const events = res.data.split("\n\n");
+      let imageURL: string | null = null;
+
+      for (const evt of events) {
+        if (evt.startsWith("data:")) {
+          try {
+            const json = JSON.parse(evt.slice(5).trim());
+            if (json.msg === "process_completed" && json.success) {
+              imageURL = json.output?.data?.[0]?.[0]?.image?.url;
+              break;
+            }
+          } catch {}
+        }
+      }
+
+      if (!imageURL) {
+        await output.unsend(processingMsg.messageID);
+        return output.reply(getLang("error"));
+      }
+
+      const imgRes = await axios.get(imageURL, { responseType: "stream" });
+      const cachePath = path.join(__dirname, "cache");
+      await fs.ensureDir(cachePath);
+      const imgPath = path.join(cachePath, `${session_hash}.png`);
+      await pipeline(imgRes.data, fs.createWriteStream(imgPath));
+
+      await output.unsend(processingMsg.messageID);
+
+      await output.reply({
+        body: getLang("success", { style: styleIndex, preset: presetIndex, ar: aspectRatio, seed: randomSeed }),
+        attachment: fs.createReadStream(imgPath),
+      });
+
+      await fs.remove(imgPath);
+    } catch (err) {
+      console.error(err);
+      await output.unsend(processingMsg.messageID);
+      await output.reply(getLang("error"));
+    }
+  }
+);
