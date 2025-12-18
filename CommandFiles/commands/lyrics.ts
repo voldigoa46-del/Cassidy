@@ -25,7 +25,7 @@ export const meta: CommandMeta = {
 };
 
 export const style: CommandStyle = {
-  title: "Astral • Lyrics Finder 🎶",
+  title: "Christus • Lyrics Finder 🎶",
   titleFont: "bold",
   contentFont: "fancy",
 };
@@ -48,7 +48,7 @@ ${UNISpectra.standardLine}
 ${data.lyrics}
 
 ${UNISpectra.standardLine}
-${UNISpectra.charm} CassidyAstral 🌌`;
+${UNISpectra.charm} ChristusBot 🌌`;
 }
 
 export const entry = defineEntry(
