@@ -32,7 +32,7 @@ export const meta: CommandMeta = {
 };
 
 export const style: CommandStyle = {
-  title: "Astral • NSFW Archive 🌌",
+  title: "Christus • NSFW Archive 🌌",
   titleFont: "bold",
   contentFont: "fancy",
 };
@@ -64,8 +64,8 @@ ${UNISpectra.charm} NSFW Media Delivered
  • 👁️ Views: ${item.views_count}
  • 🔁 Shares: ${item.share_count}
 ${UNISpectra.standardLine}
-${UNISpectra.charm} CassidyAstral-Midnight 🌃 ${UNISpectra.charm}
-[ Transmission from Astral Command ]`;
+${UNISpectra.charm} Christus-Midnight 🌃 ${UNISpectra.charm}
+[ Transmission from Christus Command ]`;
 }
 
 export const entry = defineEntry(
