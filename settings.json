@@ -19,7 +19,7 @@
     "note": "When enabled, this will allow you to customize certain styles of bot responses. {word} represents non-emoji texts and {emojis} represents emojis. Change the TITLE_PATTERN to your likings.",
     "TITLE_PATTERN": "{emojis}【 {word} 】{emojis}"
   },
-  "LOGO": "Christus Bot",
+  "LOGO": "💧𝐂𝐇𝐑𝐈𝐒𝐓𝐔𝐒 𝐁𝐎𝐓🩸",
   "ADMINBOT": ["61580333625022", "61568791604271"],
   "EXTRAPREFIX": ["§","¥"],
   "MODERATORBOT": [],
