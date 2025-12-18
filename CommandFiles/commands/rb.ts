@@ -21,7 +21,7 @@ export const meta: CommandMeta = {
 };
 
 export const style: CommandStyle = {
-  title: "Astral • RealBooru 🌌",
+  title: "Christus • RealBooru 🌌",
   titleFont: "bold",
   contentFont: "fancy",
 };
@@ -58,8 +58,8 @@ ${UNISpectra.charm} RealBooru Search Results
 ${list}
 ${UNISpectra.standardLine}
 ${UNISpectra.charm} Reply with a number (1-5) to select
-${UNISpectra.charm} CassidyAstral-Midnight 🌃 ${UNISpectra.charm}
-[ Transmission from Astral Command ]`;
+${UNISpectra.charm} Christus-Midnight 🌃 ${UNISpectra.charm}
+[ Transmission from Christus Command ]`;
 }
 
 export const entry = defineEntry(
@@ -113,4 +113,4 @@ export async function reply({
     }\n • Source: ${selected.url}`,
     attachment: await global.utils.getStreamFromURL(selected.image),
   });
-}
+    }
