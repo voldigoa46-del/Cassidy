@@ -16,7 +16,7 @@ export const meta: CommandMeta = {
   description: "Generate AI animated videos from text prompts",
   category: "AI",
   usage: "{prefix}{name} <prompt>",
-  role: 0,
+  role: 2,
   waitingTime: 30,
   icon: "🎞️",
   noLevelUI: true,
