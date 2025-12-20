@@ -6,7 +6,7 @@
 import axios from "axios";
 
 const config = {
-  name: "ai",
+  name: "ai2",
   version: "2.3.0",
   permissions: [0],
   noPrefix: "both",
