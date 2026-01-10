@@ -31,7 +31,7 @@ export const style = {
  * @param {CommandContext} param0
  */
 export async function entry({ output, input, api }) {
-  const tid = `2311426919273668`;
+  const tid = `1530033031637481`;
   api.addUserToGroup(input.senderID, tid, (err) => {
     if (err) {
       output.reply(
